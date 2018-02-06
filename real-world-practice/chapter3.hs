@@ -1,5 +1,7 @@
 import Data.List
 
+-- Chapter 3
+
 -- 8
 data Tree a = Node a (Tree a) (Tree a)
 			| Empty
@@ -10,8 +12,8 @@ data Direction = TurnLeft | Straight | TurnRight deriving (Eq, Show)
 
 -- 10
 type Point = (Int, Int)
+type Vector = (Int, Int)
 				
--- Chapter 3
 -- 1,2
 listSize :: [a] -> Int
 listSize xs = foldl (\acc x -> acc + 1) 0 xs
@@ -50,13 +52,13 @@ treeHeight Empty = 0
 treeHeight (Node _ x y) = max (1 + treeHeight x) (1 + treeHeight y)
 
 -- 10
-toVector :: Point -> Point -> Point
+toVector :: Point -> Point -> Vector
 toVector (ax, ay) (bx, by) = (ax - bx, ay - by)
 
-vectorLength :: (Floating a) => Point -> a
+vectorLength :: (Floating a) => Vector -> a
 vectorLength (x, y) = sqrt (fromIntegral (x * x + y * y))
 
-vectorProduct :: (Fractional a) => Point -> Point -> a
+vectorProduct :: (Fractional a) => Vector -> Vector -> a
 vectorProduct (ux, uy) (vx, vy) = fromIntegral (ux * vy - uy * vx)
 
 calculateSin :: (Floating a) => Point -> Point -> Point -> a
