@@ -77,3 +77,10 @@ getDirection a b c
 getDirections :: [Point] -> [Direction]
 getDirections (a:b:c:[]) = [getDirection a b c]
 getDirections (a:b:c:pts) = (getDirection a b c) : getDirections (b:c:pts)
+
+-- 12
+lowestPoint :: [Point] -> Point
+lowestPoint pts = foldl1 lowerPoint pts
+	where
+		lowerPoint (x1,y1) (x2,y2) = if (y2 < y1) then (x2,y2) else
+											if (y2 == y1) && (x2 < x1) then (x2,y2) else (x1,y1)
