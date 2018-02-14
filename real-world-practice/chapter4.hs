@@ -1,3 +1,4 @@
+import qualified Data.List as List
 --Chapter 4
 
 -- 1
@@ -25,3 +26,11 @@ splitWith splitter input =
 		(pref, suff) = break splitter input
 	in
 		pref : if null suff then [] else splitWith splitter (tail suff)
+
+-- 3
+firstWords :: String -> [String]
+firstWords input = foldr (\x acc -> (head . words $ x) : acc) [] (lines input)
+
+-- 4
+stringTranspose :: String -> String
+stringTranspose = unlines . List.transpose . lines
