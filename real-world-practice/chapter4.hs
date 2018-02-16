@@ -64,3 +64,7 @@ asInt_either input = List.foldl' consume (Right 0) input
 	consume (Right acc) x
 		| isDigit x = Right (acc * 10 + (digitToInt x))
 		| otherwise = Left ("non-digit '" ++ x : "'")
+		
+-- 3
+concat_foldr :: [[a]] -> [a]
+concat_foldr input = foldr (++) [] input
