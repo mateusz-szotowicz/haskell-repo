@@ -1,4 +1,4 @@
-import Data.List (findIndices, isInfixOf, tails)
+import Data.List (findIndex, findIndices, isInfixOf, tails)
 import System.Directory
 import System.Environment (getArgs)
 
@@ -12,18 +12,18 @@ main = do
     
 goThroughContent :: FilePath -> String -> IO ()
 goThroughContent filePath stringToCrop = do
-    isFile <- doesFileExist filePath
-    if (isFile) then do
-        putStrLn ("Renaming " ++ filePath)
-        renameFile filePath (removePart filePath stringToCrop)
+    isDir <- doesDirectoryExist filePath
+    if (isDir) then do
+        putStrLn $ "Currently checking directory " ++ filePath
+        contentList <- listDirectory filePath
+        mapM_ getPathAndTraverse contentList
     else do
-        isDir <- doesDirectoryExist filePath
-        if (isDir) then do
-            putStrLn $ "Currently checking directory " ++ filePath
-            contentList <- listDirectory filePath
-            mapM_ getPathAndTraverse contentList
+        (fileDir, xFileName) <- return $ extractFileName filePath
+        if (stringToCrop `isInfixOf` xFileName) then do
+            putStrLn ("Renaming " ++ filePath)
+            renameFile filePath (fileDir ++ (removePart xFileName stringToCrop))
         else
-            putStrLn ("There is something weird with " ++ filePath)
+            return ()
     where
         getPathAndTraverse fileName = goThroughContent (filePath ++ ('\\' : fileName)) stringToCrop
         
@@ -43,11 +43,6 @@ removePart sourcePath stringToRemove =
             firstPart ++ secondPart
     else
         sourcePath
-        
-extractFileName :: String -> (String, String)
-extractFileName filePath =
-    let (fileNameReversed, fileDirReversed) = break (\x -> x!= '\\' && x != '/') $ reverse filePath
-    in (reverse fileDirReversed, reverse fileNameReversed)
 
 indexOfPart :: String -> String -> Int
 indexOfPart inputString part =
