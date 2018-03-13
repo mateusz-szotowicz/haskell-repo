@@ -1,5 +1,7 @@
+import Control.Monad (forM_)
 import Data.List (findIndex, findIndices, isInfixOf, tails)
 import System.Directory
+import System.FilePath
 import System.Environment (getArgs)
 
 main = do
@@ -16,33 +18,26 @@ goThroughContent filePath stringToCrop = do
     if (isDir) then do
         putStrLn $ "Currently checking directory " ++ filePath
         contentList <- listDirectory filePath
-        mapM_ getPathAndTraverse contentList
+        forM_ contentList (\content -> goThroughContent (filePath </> content) stringToCrop)
     else do
-        (fileDir, xFileName) <- return $ extractFileName filePath
+        xFileName <- return $ takeBaseName filePath
         if (stringToCrop `isInfixOf` xFileName) then do
             putStrLn ("Renaming " ++ filePath)
-            renameFile filePath (fileDir ++ (removePart xFileName stringToCrop))
+            renameFile filePath (replaceBaseName filePath (removePart xFileName stringToCrop))
         else
             return ()
-    where
-        getPathAndTraverse fileName = goThroughContent (filePath ++ ('\\' : fileName)) stringToCrop
-        
-extractFileName :: String -> (String, String)
-extractFileName filePath =
-    let cutIndex = succ . last $ findIndices (=='\\') filePath
-    in (take cutIndex filePath, drop cutIndex filePath)
                 
-removePart :: FilePath -> String -> FilePath
-removePart sourcePath stringToRemove =
-    if (stringToRemove `isInfixOf` sourcePath) then
+removePart :: String -> String -> String
+removePart sourceString stringToRemove =
+    if (stringToRemove `isInfixOf` sourceString) then
         let
-            splitIndex = sourcePath `indexOfPart` stringToRemove
-            firstPart = take splitIndex sourcePath
-            secondPart = drop (splitIndex + (length stringToRemove)) sourcePath
+            splitIndex = sourceString `indexOfPart` stringToRemove
+            firstPart = take splitIndex sourceString
+            secondPart = drop (splitIndex + (length stringToRemove)) sourceString
         in
             firstPart ++ secondPart
     else
-        sourcePath
+        sourceString
 
 indexOfPart :: String -> String -> Int
 indexOfPart inputString part =
